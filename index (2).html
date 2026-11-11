@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nexa – Assistant IA de rédaction</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#EEF2FB;--panel:rgba(255,255,255,.72);--ink:#0B1030;--mute:#586085;--line:rgba(30,40,110,.16);--c1:#0A6CFF;--c2:#7C3AED;--on:#fff;--field:rgba(255,255,255,.9);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070B1A;--panel:rgba(18,24,56,.62);--ink:#E9EEFF;--mute:#98A2D0;--line:rgba(130,150,255,.24);--c1:#5CF2FF;--c2:#9B6BFF;--on:#05071A;--field:rgba(7,11,26,.7)}}
+:root[data-theme="dark"]{--bg:#070B1A;--panel:rgba(18,24,56,.62);--ink:#E9EEFF;--mute:#98A2D0;--line:rgba(130,150,255,.24);--c1:#5CF2FF;--c2:#9B6BFF;--on:#05071A;--field:rgba(7,11,26,.7)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);min-height:100%}
+body{margin:0;min-height:100vh;color:var(--ink);font:400 15px/1.55 'DM Sans',system-ui,sans-serif;background:radial-gradient(60% 45% at 85% 0%,color-mix(in srgb,var(--c2) 30%,transparent),transparent),radial-gradient(50% 40% at 0% 100%,color-mix(in srgb,var(--c1) 24%,transparent),transparent),var(--bg);background-attachment:fixed}
+h1,h2{font-family:'Sora','DM Sans',sans-serif;margin:0}
+button,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--c1);outline-offset:2px}
+main{max-width:1080px;margin:0 auto;padding:28px 18px 60px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}
+.logo{display:flex;align-items:center;gap:10px;font:800 22px 'Sora',sans-serif;letter-spacing:-.02em}
+.mark{width:28px;height:28px;border-radius:50%;background:conic-gradient(from 200deg,var(--c1),var(--c2),var(--c1));position:relative}
+.mark::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--bg)}
+.sub{color:var(--mute);font-size:13px}
+.hero{margin-bottom:24px}
+.hero h1{font-size:clamp(30px,5vw,52px);line-height:1.05;letter-spacing:-.035em;max-width:16ch;background:linear-gradient(100deg,var(--ink) 30%,var(--c2) 70%,var(--c1));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--mute);max-width:52ch;margin:12px 0 0}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.panel h2{font-size:15px;margin-bottom:10px;color:var(--mute);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{border:1px solid var(--line);background:none;border-radius:999px;padding:7px 14px;cursor:pointer;font-size:14px}
+.chip[aria-pressed=true]{border-color:var(--c1);background:color-mix(in srgb,var(--c1) 16%,transparent);font-weight:700}
+textarea,select{width:100%;border:1px solid var(--line);border-radius:14px;background:var(--field);padding:12px 14px}
+textarea{min-height:170px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.go{width:100%;border:0;border-radius:14px;padding:14px;font:700 16px 'Sora',sans-serif;cursor:pointer;color:var(--on);background:linear-gradient(100deg,var(--c1),var(--c2))}
+.go:disabled{opacity:.6;cursor:progress}
+.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px}
+.orb{width:14px;height:14px;border-radius:50%;background:conic-gradient(var(--c1),var(--c2),var(--c1));display:inline-block;margin-right:8px;vertical-align:-2px}
+.busy .orb{animation:sp .9s linear infinite}
+@keyframes sp{to{transform:rotate(1turn)}}
+@media(prefers-reduced-motion:reduce){.busy .orb{animation:none}}
+#out{white-space:pre-wrap;min-height:220px;font-size:16px;line-height:1.65;overflow-wrap:anywhere}
+#out:empty::before{content:"Ton texte apparaîtra ici. Décris ce que tu veux dire, Nexa s’occupe de la forme.";color:var(--mute)}
+.act{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.act button{border:1px solid var(--line);background:none;border-radius:10px;padding:8px 12px;cursor:pointer;font-size:14px}
+.act button:disabled{opacity:.45;cursor:not-allowed}
+.err{color:#E5484D;font-size:14px;min-height:20px;margin:8px 0 0}
+.hist{margin-top:18px}
+.hist button{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:9px 2px;cursor:pointer;color:var(--mute);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist button:hover{color:var(--ink)}
+.pay{margin-top:18px}.pay h2.t{font-size:22px;color:var(--ink);font-weight:800;margin-bottom:4px}.pay ol{margin:8px 0 16px;padding-left:20px;color:var(--mute)}.pay li{margin:8px 0}.pay li b{color:var(--ink);font-family:'Sora',sans-serif;letter-spacing:.02em}.pay input{width:100%;border:1px solid var(--line);border-radius:14px;background:var(--field);padding:12px 14px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="logo"><span class="mark"></span>Nexa</div><div class="sub">Assistant de rédaction</div></header>
+<section class="hero"><h1>Écris mieux, en quelques secondes.</h1><p>E-mails, annonces WhatsApp, descriptions de produits, lettres : dis ce que tu veux, Nexa rédige, corrige ou traduit.</p></section>
+<div class="grid">
+ <section class="panel">
+  <h2>Que veux-tu faire ?</h2>
+  <div class="chips" id="g-mode" role="group" aria-label="Action"></div>
+  <div id="fmtbox"><h2>Format</h2><div class="chips" id="g-fmt" role="group" aria-label="Format"></div></div>
+  <h2 id="lbl">Ton idée</h2>
+  <textarea id="txt" placeholder="Ex. : je veux relancer un client qui n’a pas payé sa commande de 3 robes"></textarea>
+  <div class="two" style="margin-top:14px">
+   <div id="tonebox"><h2>Ton</h2><select id="tone"><option>professionnel</option><option>chaleureux</option><option>persuasif</option><option>direct et court</option></select></div>
+   <div><h2>Langue</h2><select id="lang"><option>français</option><option>anglais</option><option>espagnol</option><option>portugais</option></select></div>
+  </div>
+  <button class="go" id="go">Générer</button>
+  <p class="err" id="err" role="alert"></p>
+ </section>
+ <section class="panel" id="res">
+  <div class="head"><h2><span class="orb"></span><span id="st">Résultat</span></h2><span class="sub" id="wc"></span></div>
+  <div id="out" aria-live="polite"></div>
+  <div class="act"><button id="cp" disabled>Copier</button><button id="wa" disabled>Envoyer sur WhatsApp</button><button id="rg" disabled>Régénérer</button><button id="stop" hidden>Arrêter</button></div>
+  <div class="hist" id="hist"></div>
+ </section>
+</div>
+<section class="panel pay" id="pay">
+ <h2 class="t">Débloquer Nexa</h2><p class="sub" style="margin:0 0 14px">Paiement par Mobile Money : choisis ton opérateur et ton pass.</p>
+ <div class="chips" id="ops" role="group" aria-label="Opérateur"></div>
+ <div class="chips" id="plans" role="group" aria-label="Choisir un pass"></div>
+ <ol><li>Envoie le montant du pass par <span id="opn">Moov Money</span> au <b id="pnum">79 13 30 08</b> <button class="chip" id="pcopy" style="margin-left:6px">Copier le numéro</button></li><li>Garde le message de confirmation de Moov.</li><li>Renseigne ton nom et la référence de la transaction, puis envoie la preuve sur WhatsApp. Ton accès est activé après vérification.</li></ol>
+ <div class="two"><input type="text" id="pn" placeholder="Ton nom" autocomplete="name" aria-label="Ton nom"><input type="text" id="pr" placeholder="Référence de la transaction" aria-label="Référence de la transaction"></div>
+ <button class="go" id="paid">J’ai payé : envoyer la preuve</button><p class="err" id="perr" role="alert"></p>
+</section>
+</main>
+<script>
+var $=function(i){return document.getElementById(i)};
+var MODES=[['ecrire','Rédiger'],['corriger','Corriger'],['reformuler','Reformuler'],['raccourcir','Raccourcir'],['traduire','Traduire']];
+var FMT=['E-mail','Message WhatsApp','Post réseaux sociaux','Description de produit','Lettre de motivation','Article court'];
+var ST={mode:'ecrire',fmt:0},ctrl=null,hist=[];
+try{hist=JSON.parse(localStorage.getItem('nexa1')||'[]')}catch(e){}
+function chips(id,arr,key){$(id).innerHTML=arr.map(function(a,i){var v=Array.isArray(a)?a[0]:i,l=Array.isArray(a)?a[1]:a;return '<button class="chip" data-v="'+v+'" aria-pressed="'+(ST[key]==v)+'">'+l+'</button>'}).join('')}
+function ui(){chips('g-mode',MODES,'mode');chips('g-fmt',FMT,'fmt');var w=ST.mode=='ecrire';$('fmtbox').hidden=!w;$('tonebox').hidden=!w;
+ $('lbl').textContent=w?'Ton idée':'Ton texte';$('txt').placeholder=w?'Ex. : je veux relancer un client qui n’a pas payé sa commande de 3 robes':'Colle ici le texte à travailler';
+ $('go').textContent={ecrire:'Générer',corriger:'Corriger',reformuler:'Reformuler',raccourcir:'Raccourcir',traduire:'Traduire'}[ST.mode]}
+$('g-mode').onclick=function(e){var b=e.target.closest('.chip');if(b){ST.mode=b.dataset.v;ui()}};
+$('g-fmt').onclick=function(e){var b=e.target.closest('.chip');if(b){ST.fmt=+b.dataset.v;ui()}};
+function prompt_(){var t=$('txt').value.trim(),l=$('lang').value,m=ST.mode;
+ var p='Tu es Nexa, un assistant de rédaction. Réponds uniquement avec le texte final, sans introduction, sans commentaire, sans guillemets autour. Le public est composé de commerçants et d’entrepreneurs d’Afrique de l’Ouest : écris simplement et naturellement, sans jargon.\n\n';
+ if(m=='ecrire')p+='Rédige un(e) '+FMT[ST.fmt]+' en '+l+', sur un ton '+$('tone').value+'. Adapte la longueur au format.\nSujet et détails :\n'+t;
+ else if(m=='traduire')p+='Traduis ce texte en '+l+', fidèlement et naturellement.\nTexte :\n'+t;
+ else p+={corriger:'Corrige l’orthographe, la grammaire et la ponctuation de ce texte sans changer le sens ni le ton.',reformuler:'Reformule ce texte pour qu’il soit plus clair, plus fluide et plus convaincant, dans la même langue.',raccourcir:'Raccourcis ce texte de moitié environ en gardant l’essentiel, dans la même langue.'}[m]+'\nTexte :\n'+t;
+ return p}
+function wc(){var s=$('out').textContent.trim();$('wc').textContent=s?s.split(/\s+/).length+' mots':'';['cp','wa','rg'].forEach(function(i){$(i).disabled=!s})}
+function busy(b){$('res').classList.toggle('busy',b);$('go').disabled=b;$('stop').hidden=!b;$('st').textContent=b?'Nexa écrit…':'Résultat'}
+async function run(){var e=$('err');e.textContent='';
+ if(!$('txt').value.trim()){e.textContent='Écris d’abord ton idée ou colle un texte.';return}
+ var s=null;try{s=window.claude&&await claude.use('sample')}catch(x){}
+ if(!s){e.textContent='Nexa fonctionne quand la page est ouverte depuis Claude (connecte-toi à claude.ai).';return}
+ ctrl=new AbortController();busy(true);$('out').textContent='';
+ try{var r=await s(prompt_(),{onText:function(o){$('out').textContent=o.text;wc()},signal:ctrl.signal,cache:false});$('out').textContent=r.text;
+  hist.unshift({m:ST.mode,t:$('txt').value.trim().slice(0,70),o:r.text});hist=hist.slice(0,8);try{localStorage.setItem('nexa1',JSON.stringify(hist))}catch(x){}drawH()}
+ catch(x){if(x&&x.code=='rate_limited')e.textContent='Trop de demandes. Réessaie dans un instant.';else if(x&&x.code=='not_granted')e.textContent='Autorisation refusée : Nexa a besoin de l’accès à Claude pour écrire.';else if(!(x&&x.name=='AbortError'))e.textContent='Une erreur est survenue. Réessaie.'}
+ busy(false);wc()}
+function drawH(){$('hist').innerHTML=hist.length?'<h2>Récents</h2>'+hist.map(function(h,i){return '<button data-i="'+i+'">'+h.t.replace(/[<>&]/g,'')+'</button>'}).join(''):''}
+$('hist').onclick=function(e){var b=e.target.closest('button');if(b){$('out').textContent=hist[+b.dataset.i].o;wc()}};
+$('go').onclick=run;$('rg').onclick=run;$('stop').onclick=function(){if(ctrl)ctrl.abort()};
+$('cp').onclick=function(){var t=$('out').textContent;var done=function(){$('cp').textContent='Copié ✓';setTimeout(function(){$('cp').textContent='Copier'},1500)};
+ try{navigator.clipboard.writeText(t).then(done,function(){sel()})}catch(x){sel()}function sel(){var r=document.createRange();r.selectNodeContents($('out'));var g=getSelection();g.removeAllRanges();g.addRange(r)}};
+$('wa').onclick=function(){window.open('https://wa.me/?text='+encodeURIComponent($('out').textContent),'_blank')};
+var PL=[['Pass 1 jour',500],['Pass 7 jours',2000],['Pass mois',5000]],pl=1,OPS=[['Moov Money (Flooz)','79133008','79 13 30 08'],['T-Money','73368474','73 36 84 74']],po=0;
+function fx(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'\u202f')+' FCFA'}
+function drawO(){$('ops').innerHTML=OPS.map(function(o,i){return '<button class="chip" data-o="'+i+'" aria-pressed="'+(po==i)+'">'+o[0]+'</button>'}).join('');$('opn').textContent=OPS[po][0];$('pnum').textContent=OPS[po][2]}
+$('ops').onclick=function(e){var b=e.target.closest('.chip');if(b){po=+b.dataset.o;drawO()}};
+function drawP(){$('plans').innerHTML=PL.map(function(p,i){return '<button class="chip" data-i="'+i+'" aria-pressed="'+(pl==i)+'">'+p[0]+' · '+fx(p[1])+'</button>'}).join('')}
+$('plans').onclick=function(e){var b=e.target.closest('.chip');if(b){pl=+b.dataset.i;drawP()}};
+$('pcopy').onclick=function(){var b=this,t=OPS[po][1];try{navigator.clipboard.writeText(t).then(function(){b.textContent='Copié ✓';setTimeout(function(){b.textContent='Copier le numéro'},1500)})}catch(x){}};
+$('paid').onclick=function(){var n=$('pn').value.trim(),r=$('pr').value.trim(),e=$('perr');e.textContent='';
+ if(!n||!r){e.textContent='Indique ton nom et la référence de la transaction.';return}
+ var m='Bonjour, j’ai payé le '+PL[pl][0]+' de Nexa ('+fx(PL[pl][1])+') par '+OPS[po][0]+' au '+OPS[po][1]+'.\nNom : '+n+'\nRéférence de la transaction : '+r;
+ var u='https://wa.me/22892527121?text='+encodeURIComponent(m);var w=window.open(u,'_blank');if(!w)e.innerHTML='<a href="'+u+'" target="_blank" rel="noopener" style="color:inherit">Ouvrir WhatsApp</a>'};
+drawP();drawO();
+ui();drawH();wc();
+</script>
+</body>
+</html>
